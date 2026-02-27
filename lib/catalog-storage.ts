@@ -11,6 +11,10 @@ function hasBlobToken(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
+function isVercelRuntime(): boolean {
+  return Boolean(process.env.VERCEL) || Boolean(process.env.VERCEL_ENV);
+}
+
 function getCatalogPath(): string {
   return path.join(process.cwd(), CATALOG_DIRNAME, CATALOG_FILENAME);
 }
@@ -84,6 +88,12 @@ export async function writeCatalog(artworks: Artwork[]): Promise<void> {
       addRandomSuffix: false,
     });
     return;
+  }
+
+  if (isVercelRuntime()) {
+    throw new Error(
+      'Missing BLOB_READ_WRITE_TOKEN. Catalog writes are not supported on Vercel filesystem; configure Vercel Blob and set the env var.'
+    );
   }
 
   const catalogPath = getCatalogPath();

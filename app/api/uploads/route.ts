@@ -47,7 +47,19 @@ export async function POST(request: Request) {
   const name = `${crypto.randomBytes(16).toString('hex')}${ext}`;
 
   // On Vercel, the filesystem is read-only/ephemeral. Prefer Vercel Blob when configured.
+  const isVercel = Boolean(process.env.VERCEL) || Boolean(process.env.VERCEL_ENV);
   const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+
+  if (isVercel && !hasBlobToken) {
+    return NextResponse.json(
+      {
+        error:
+          'Missing BLOB_READ_WRITE_TOKEN. Configure Vercel Blob and set the env var in Vercel, then redeploy.',
+      },
+      { status: 500 }
+    );
+  }
+
   if (hasBlobToken) {
     try {
       const pathname = `uploads/${name}`;
