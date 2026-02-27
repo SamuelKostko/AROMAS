@@ -38,6 +38,7 @@ async function ensureCatalogFile(): Promise<void> {
         access: 'public',
         contentType: 'application/json; charset=utf-8',
         addRandomSuffix: false,
+        allowOverwrite: true,
       });
       return;
     }
@@ -86,6 +87,7 @@ export async function writeCatalog(artworks: Artwork[]): Promise<void> {
       access: 'public',
       contentType: 'application/json; charset=utf-8',
       addRandomSuffix: false,
+      allowOverwrite: true,
     });
     return;
   }
