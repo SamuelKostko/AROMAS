@@ -10,10 +10,6 @@ function mergeArtwork(existing: Artwork, patch: Partial<Artwork>): Artwork {
     ...existing,
     ...patch,
     id: existing.id,
-    dimensions: {
-      ...existing.dimensions,
-      ...(patch.dimensions ?? {}),
-    },
   };
 }
 

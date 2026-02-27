@@ -3,16 +3,20 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { categories } from '@/lib/art-data';
+import { categories, priceRanges } from '@/lib/art-data';
 
 interface FilterSidebarProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
+  selectedPriceRange: string;
+  onPriceRangeChange: (rangeLabel: string) => void;
 }
 
 export default function FilterSidebar({
   selectedCategory,
   onCategoryChange,
+  selectedPriceRange,
+  onPriceRangeChange,
 }: FilterSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -35,6 +39,8 @@ export default function FilterSidebar({
           <FilterContent
             selectedCategory={selectedCategory}
             onCategoryChange={onCategoryChange}
+            selectedPriceRange={selectedPriceRange}
+            onPriceRangeChange={onPriceRangeChange}
           />
         </div>
       </aside>
@@ -74,6 +80,11 @@ export default function FilterSidebar({
                     onCategoryChange(category);
                     setIsOpen(false);
                   }}
+                  selectedPriceRange={selectedPriceRange}
+                  onPriceRangeChange={(rangeLabel) => {
+                    onPriceRangeChange(rangeLabel);
+                    setIsOpen(false);
+                  }}
                 />
               </div>
             </motion.div>
@@ -87,6 +98,8 @@ export default function FilterSidebar({
 function FilterContent({
   selectedCategory,
   onCategoryChange,
+  selectedPriceRange,
+  onPriceRangeChange,
 }: FilterSidebarProps) {
   return (
     <div className="space-y-8">
@@ -111,12 +124,25 @@ function FilterContent({
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-neutral-200 pt-6">
-        <p className="font-sans text-xs text-neutral-500 leading-relaxed">
-          Todas las obras están disponibles para compra inmediata o pueden ser reservadas
-          mediante consulta vía WhatsApp.
-        </p>
+      {/* Price */}
+      <div>
+        <h3 className="font-display text-lg text-foreground mb-4">Precio</h3>
+        <div className="space-y-2">
+          {priceRanges.map((range) => (
+            <motion.button
+              key={range.label}
+              whileHover={{ x: 4 }}
+              onClick={() => onPriceRangeChange(range.label)}
+              className={`block w-full text-left px-4 py-2 rounded-sm transition-colors ${
+                selectedPriceRange === range.label
+                  ? 'bg-foreground text-background font-medium'
+                  : 'text-neutral-600 hover:bg-neutral-100'
+              }`}
+            >
+              <span className="font-sans text-sm tracking-wide">{range.label}</span>
+            </motion.button>
+          ))}
+        </div>
       </div>
     </div>
   );

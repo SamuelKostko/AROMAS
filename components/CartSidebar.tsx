@@ -48,7 +48,7 @@ export default function CartSidebar() {
               <div>
                 <h2 className="font-display text-2xl text-foreground">Tu Carrito</h2>
                 <p className="font-sans text-sm text-neutral-600 mt-1">
-                  {items.length} {items.length === 1 ? 'obra' : 'obras'}
+                  {items.length} {items.length === 1 ? 'vela' : 'velas'}
                 </p>
               </div>
               <button
@@ -68,13 +68,13 @@ export default function CartSidebar() {
                     <motion.div
                       animate={{ rotate: [0, 10, -10, 0] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      🎨
+                      >
+                      🕯️
                     </motion.div>
                   </div>
                   <p className="font-sans text-neutral-600 mb-2">Tu carrito está vacío</p>
                   <p className="font-sans text-sm text-neutral-500">
-                    Explora nuestro catálogo y descubre obras únicas
+                    Explora nuestro catálogo y descubre velas únicas
                   </p>
                 </div>
               ) : (
@@ -98,11 +98,8 @@ export default function CartSidebar() {
                           <h3 className="font-display text-base text-foreground truncate">
                             {item.title}
                           </h3>
-                          <p className="font-sans text-sm text-neutral-600 truncate">
-                            {item.artist}
-                          </p>
                           <p className="font-sans text-sm font-semibold text-foreground mt-2">
-                            ${item.price.toLocaleString()} {item.currency}
+                            ${item.price.toLocaleString()}
                           </p>
                         </div>
                         <button
@@ -153,7 +150,7 @@ export default function CartSidebar() {
                 <div className="flex items-center justify-between">
                   <span className="font-display text-xl text-foreground">Total</span>
                   <span className="font-display text-2xl text-foreground">
-                    ${totalPrice.toLocaleString()} {items[0]?.currency || 'USD'}
+                    ${totalPrice.toLocaleString()}
                   </span>
                 </div>
 

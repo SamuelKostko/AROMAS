@@ -4,62 +4,59 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import ArtCard from './ArtCard';
 import FilterSidebar from './FilterSidebar';
-import type { Artwork } from '@/lib/art-data';
+import { categories, priceRanges, type Artwork } from '@/lib/art-data';
 
-type ArtworkDraft = Partial<Artwork> & {
-  dimensions?: Partial<Artwork['dimensions']>;
-};
+type ArtworkDraft = Partial<Artwork>;
+
+const DEFAULT_CATEGORY = categories.find((category) => category !== 'Todos') ?? 'Velas aromáticas';
+
+function matchesPriceRange(price: number, rangeLabel: string): boolean {
+  const range = priceRanges.find((r) => r.label === rangeLabel) ?? priceRanges[0];
+  if (!range || range.label === 'Todos') return true;
+
+  const minOk = range.minExclusive ? price > range.min : price >= range.min;
+  const maxOk =
+    range.max === Infinity
+      ? true
+      : range.maxInclusive
+        ? price <= range.max
+        : price < range.max;
+
+  return minOk && maxOk;
+}
 
 function normalizeDraft(draft: ArtworkDraft): ArtworkDraft {
-  const safeYear = Number.isFinite(Number(draft.year)) ? Number(draft.year) : new Date().getFullYear();
   const safePrice = Number.isFinite(Number(draft.price)) ? Number(draft.price) : 0;
-  const safeWidth = Number.isFinite(Number(draft.dimensions?.width)) ? Number(draft.dimensions?.width) : 0;
-  const safeHeight = Number.isFinite(Number(draft.dimensions?.height)) ? Number(draft.dimensions?.height) : 0;
-  const safeUnit = (draft.dimensions?.unit ?? 'cm').toString();
+  const safeCategory = String(draft.category ?? '').trim();
 
   return {
     ...draft,
     title: (draft.title ?? '').toString(),
-    artist: (draft.artist ?? '').toString(),
-    category: (draft.category ?? '').toString(),
-    currency: (draft.currency ?? 'USD').toString(),
-    medium: (draft.medium ?? '').toString(),
     description: (draft.description ?? '').toString(),
     image: (draft.image ?? '').toString(),
-    edition: (draft.edition ?? '').toString(),
-    year: safeYear,
     price: safePrice,
-    availability: (draft.availability as Artwork['availability']) ?? 'available',
-    dimensions: {
-      width: safeWidth,
-      height: safeHeight,
-      unit: safeUnit,
-    },
+    category: safeCategory || DEFAULT_CATEGORY,
   };
 }
 
 export default function ArtGallery() {
   const [adminMode, setAdminMode] = useState(false);
-
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string>(
+    priceRanges[0]?.label ?? 'Todos'
+  );
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<ArtworkDraft>(() => ({
     title: '',
-    artist: '',
-    year: new Date().getFullYear(),
+    category: DEFAULT_CATEGORY,
     price: 0,
-    currency: 'USD',
-    category: 'Pintura',
-    availability: 'available',
     image: '',
-    medium: '',
     description: '',
-    edition: '',
-    dimensions: { width: 0, height: 0, unit: 'cm' },
   }));
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -96,29 +93,14 @@ export default function ArtGallery() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const filteredArtworks = useMemo(() => {
-    return artworks.filter((artwork) => {
-      const categoryMatch =
-        selectedCategory === 'Todos' || artwork.category === selectedCategory;
-      return categoryMatch;
-    });
-  }, [artworks, selectedCategory]);
-
   const resetDraft = () => {
     setEditingId(null);
     setDraft({
       title: '',
-      artist: '',
-      year: new Date().getFullYear(),
+      category: DEFAULT_CATEGORY,
       price: 0,
-      currency: 'USD',
-      category: 'Pintura',
-      availability: 'available',
       image: '',
-      medium: '',
       description: '',
-      edition: '',
-      dimensions: { width: 0, height: 0, unit: 'cm' },
     });
   };
 
@@ -126,9 +108,25 @@ export default function ArtGallery() {
     setEditingId(artwork.id);
     setDraft({
       ...artwork,
-      edition: artwork.edition ?? '',
+      category: String(artwork.category ?? '').trim() || DEFAULT_CATEGORY,
     });
   };
+
+  const filteredArtworks = useMemo(() => {
+    const normalizedCategory = selectedCategory.trim();
+    const normalizedRange = selectedPriceRange.trim();
+
+    return artworks.filter((artwork) => {
+      const artworkCategory = String(artwork.category ?? '').trim() || DEFAULT_CATEGORY;
+      const matchesCategory = normalizedCategory === 'Todos' || artworkCategory === normalizedCategory;
+
+      const numericPrice = Number(artwork.price);
+      const safePrice = Number.isFinite(numericPrice) ? numericPrice : 0;
+      const matchesPrice = matchesPriceRange(safePrice, normalizedRange);
+
+      return matchesCategory && matchesPrice;
+    });
+  }, [artworks, selectedCategory, selectedPriceRange]);
 
   const saveDraft = async () => {
     const normalized = normalizeDraft(draft);
@@ -189,7 +187,7 @@ export default function ArtGallery() {
   };
 
   const deleteArtwork = async (id: string) => {
-    const ok = window.confirm('¿Eliminar esta obra del catálogo?');
+    const ok = window.confirm('¿Eliminar este producto del catálogo?');
     if (!ok) return;
 
     setIsSaving(true);
@@ -239,35 +237,25 @@ export default function ArtGallery() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <input
                     value={draft.title ?? ''}
                     onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-                    placeholder="Título"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
-                  />
-                  <input
-                    value={draft.artist ?? ''}
-                    onChange={(e) => setDraft((d) => ({ ...d, artist: e.target.value }))}
-                    placeholder="Artista"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
-                  />
-                  <input
-                    value={draft.category ?? ''}
-                    onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))}
-                    placeholder="Categoría"
+                    placeholder="Nombre"
                     className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
                   />
                   <select
-                    value={(draft.availability as string) ?? 'available'}
-                    onChange={(e) =>
-                      setDraft((d) => ({ ...d, availability: e.target.value as Artwork['availability'] }))
-                    }
+                    value={String(draft.category ?? DEFAULT_CATEGORY)}
+                    onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))}
                     className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
                   >
-                    <option value="available">Disponible</option>
-                    <option value="reserved">Reservado</option>
-                    <option value="sold">Vendido</option>
+                    {categories
+                      .filter((category) => category !== 'Todos')
+                      .map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
                   </select>
                   <input
                     type="number"
@@ -276,23 +264,11 @@ export default function ArtGallery() {
                     placeholder="Precio"
                     className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
                   />
-                  <input
-                    value={draft.currency ?? 'USD'}
-                    onChange={(e) => setDraft((d) => ({ ...d, currency: e.target.value }))}
-                    placeholder="Moneda (USD)"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
-                  />
-                  <input
-                    value={draft.medium ?? ''}
-                    onChange={(e) => setDraft((d) => ({ ...d, medium: e.target.value }))}
-                    placeholder="Técnica / Medium"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
-                  />
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="font-sans text-sm text-neutral-600">Imagen de la obra</p>
+                    <p className="font-sans text-sm text-neutral-600">Imagen del producto</p>
                     {draft.image ? (
                       <p className="font-sans text-xs text-neutral-600 truncate">{draft.image}</p>
                     ) : (
@@ -324,71 +300,14 @@ export default function ArtGallery() {
                   rows={4}
                   className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
                 />
-
-                <div className="grid grid-cols-3 gap-3">
-                  <input
-                    type="number"
-                    value={Number(draft.dimensions?.width ?? 0)}
-                    onChange={(e) =>
-                      setDraft((d) => ({
-                        ...d,
-                        dimensions: {
-                          width: Number(e.target.value),
-                          height: Number(d.dimensions?.height ?? 0),
-                          unit: (d.dimensions?.unit ?? 'cm').toString(),
-                        },
-                      }))
-                    }
-                    placeholder="Ancho"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
-                  />
-                  <input
-                    type="number"
-                    value={Number(draft.dimensions?.height ?? 0)}
-                    onChange={(e) =>
-                      setDraft((d) => ({
-                        ...d,
-                        dimensions: {
-                          width: Number(d.dimensions?.width ?? 0),
-                          height: Number(e.target.value),
-                          unit: (d.dimensions?.unit ?? 'cm').toString(),
-                        },
-                      }))
-                    }
-                    placeholder="Alto"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
-                  />
-                  <input
-                    value={draft.dimensions?.unit ?? 'cm'}
-                    onChange={(e) =>
-                      setDraft((d) => ({
-                        ...d,
-                        dimensions: {
-                          width: Number(d.dimensions?.width ?? 0),
-                          height: Number(d.dimensions?.height ?? 0),
-                          unit: e.target.value,
-                        },
-                      }))
-                    }
-                    placeholder="Unidad (cm)"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
-                  />
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input
-                    value={draft.edition ?? ''}
-                    onChange={(e) => setDraft((d) => ({ ...d, edition: e.target.value }))}
-                    placeholder="Edición (opcional)"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm bg-background font-sans text-sm"
-                  />
                   <div className="flex items-center gap-2">
                     <button
                       onClick={saveDraft}
                       disabled={isSaving || isUploadingImage || !String(draft.title ?? '').trim()}
                       className="flex-1 px-4 py-2 rounded-sm bg-foreground text-background font-sans text-sm font-semibold hover:bg-neutral-800 transition-colors disabled:opacity-50"
                     >
-                      {editingId ? 'Guardar cambios' : 'Agregar obra'}
+                        {editingId ? 'Guardar cambios' : 'Agregar producto'}
                     </button>
                     {editingId && (
                       <button
@@ -406,7 +325,7 @@ export default function ArtGallery() {
               <div className="border border-neutral-200 rounded-sm bg-background">
                 <div className="px-4 py-3 border-b border-neutral-200">
                   <p className="font-sans text-sm text-neutral-600">
-                    Obras ({artworks.length})
+                    Productos ({artworks.length})
                   </p>
                 </div>
                 <div className="max-h-[420px] overflow-y-auto">
@@ -420,7 +339,7 @@ export default function ArtGallery() {
                           {artwork.title}
                         </p>
                         <p className="font-sans text-xs text-neutral-600 truncate">
-                          #{artwork.id} · ${artwork.price.toLocaleString()} {artwork.currency} · {artwork.availability}
+                          #{artwork.id} · ${artwork.price.toLocaleString()}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -454,19 +373,21 @@ export default function ArtGallery() {
           className="mb-12 text-center lg:text-left"
         >
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-foreground mb-4">
-            Catálogo de Arte
+            Catálogo de Velas
           </h1>
           <p className="font-sans text-lg text-neutral-600 max-w-2xl mx-auto lg:mx-0">
-            Descubre obras únicas. Cada pieza cuenta una
-            historia y transforma espacios.
+            Descubre velas aromáticas para llenar tus espacios de calidez.
+            Elige tu aroma favorito y consulta disponibilidad por WhatsApp.
           </p>
         </motion.div>
 
-        {/* Gallery with Sidebar */}
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        {/* Gallery */}
+        <div className="flex flex-col lg:flex-row gap-8">
           <FilterSidebar
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
+            selectedPriceRange={selectedPriceRange}
+            onPriceRangeChange={setSelectedPriceRange}
           />
 
           <div className="flex-1">
@@ -478,7 +399,7 @@ export default function ArtGallery() {
             >
               <p className="font-sans text-sm text-neutral-600">
                 {filteredArtworks.length}{' '}
-                {filteredArtworks.length === 1 ? 'obra encontrada' : 'obras encontradas'}
+                {filteredArtworks.length === 1 ? 'vela encontrada' : 'velas encontradas'}
               </p>
             </motion.div>
 
@@ -499,10 +420,12 @@ export default function ArtGallery() {
                   <span className="text-4xl">🔍</span>
                 </div>
                 <h3 className="font-display text-2xl text-foreground mb-2">
-                  No se encontraron obras
+                  No se encontraron velas
                 </h3>
                 <p className="font-sans text-neutral-600">
-                  Intenta ajustar los filtros para ver más resultados
+                  {artworks.length === 0
+                    ? 'Aún no hay velas en el catálogo.'
+                    : 'No hay velas que coincidan con los filtros seleccionados.'}
                 </p>
               </motion.div>
             )}

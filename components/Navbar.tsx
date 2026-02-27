@@ -1,11 +1,12 @@
 'use client';
 
-import { Instagram, ShoppingBag, Menu, X } from 'lucide-react';
+import { MessageCircle, ShoppingBag, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/cart-store';
+import { SITE } from '@/lib/site';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,14 +31,14 @@ export default function Navbar() {
               <Link href="/" className="flex items-center space-x-2">
                 <Image
                   src="/images/logo.png"
-                  alt="HYOSS_ART"
+                  alt={SITE.brandName}
                   width={128}
                   height={128}
                   className="w-8 h-8 rounded-sm object-contain"
                   priority
                 />
                 <span className="font-display text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
-                  HYOSS_ART
+                  {SITE.brandName}
                 </span>
               </Link>
             </motion.div>
@@ -58,18 +59,18 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Instagram + Cart */}
+            {/* WhatsApp + Cart */}
             <div className="flex items-center space-x-4">
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                href="https://www.instagram.com/hyoss_art?igsh=ZHczMmt0eTYyOWpo"
+                href={SITE.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
-                aria-label="Instagram"
+                aria-label="WhatsApp"
               >
-                <Instagram className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+                <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
               </motion.a>
 
               <motion.button

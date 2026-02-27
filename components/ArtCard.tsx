@@ -52,15 +52,6 @@ export default function ArtCard({ artwork, index }: ArtCardProps) {
             <div className="absolute inset-0 bg-neutral-200 animate-pulse" />
           )}
 
-          {/* Availability Badge */}
-          {artwork.availability !== 'available' && (
-            <div className="absolute top-3 left-3">
-              <span className="px-3 py-1 bg-foreground/90 text-background text-xs font-sans tracking-wide rounded-full">
-                {artwork.availability === 'reserved' ? 'Reservado' : 'Vendido'}
-              </span>
-            </div>
-          )}
-
           {/* Action Buttons */}
           <div className="absolute top-3 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <motion.button
@@ -76,17 +67,15 @@ export default function ArtCard({ artwork, index }: ArtCardProps) {
                 }`}
               />
             </motion.button>
-            {artwork.availability === 'available' && (
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleAddToCart}
-                className="p-2 bg-foreground/90 backdrop-blur-sm rounded-full shadow-lg"
-                aria-label="Añadir al carrito"
-              >
-                <ShoppingBag className="w-5 h-5 text-background" />
-              </motion.button>
-            )}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleAddToCart}
+              className="p-2 bg-foreground/90 backdrop-blur-sm rounded-full shadow-lg"
+              aria-label="Añadir al carrito"
+            >
+              <ShoppingBag className="w-5 h-5 text-background" />
+            </motion.button>
           </div>
 
           {/* Hover Overlay */}
@@ -101,31 +90,14 @@ export default function ArtCard({ artwork, index }: ArtCardProps) {
                 {artwork.title}
               </h3>
               <p className="font-sans text-sm text-neutral-600 truncate">
-                {artwork.artist}
+                {artwork.description}
               </p>
             </div>
             <div className="flex-shrink-0 text-right">
               <p className="font-sans text-base sm:text-lg font-semibold text-foreground">
                 ${artwork.price.toLocaleString()}
               </p>
-              <p className="font-sans text-xs text-neutral-500">
-                {artwork.currency}
-              </p>
             </div>
-          </div>
-
-          <div className="flex items-center space-x-3 text-xs text-neutral-500">
-            <span>{artwork.medium}</span>
-            <span>•</span>
-            <span>
-              {artwork.dimensions.width}×{artwork.dimensions.height} {artwork.dimensions.unit}
-            </span>
-          </div>
-
-          <div className="pt-2">
-            <span className="inline-block px-2 py-1 bg-accent-cream text-foreground text-xs font-sans tracking-wide rounded">
-              {artwork.category}
-            </span>
           </div>
         </div>
       </Link>

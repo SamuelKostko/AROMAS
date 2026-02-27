@@ -1,36 +1,31 @@
 export interface Artwork {
   id: string;
-  title: string;
-  artist: string;
-  year: number;
-  price: number;
-  currency: string;
-  dimensions: {
-    width: number;
-    height: number;
-    unit: string;
-  };
-  medium: string;
   description: string;
   image: string;
+  title: string;
+  price: number;
   category: string;
-  availability: 'available' | 'reserved' | 'sold';
-  edition?: string;
 }
+
+export type PriceRange = {
+  label: string;
+  min: number;
+  max: number;
+  minExclusive?: boolean;
+  maxInclusive?: boolean;
+};
 
 export const categories = [
   'Todos',
-  'Pintura',
-  'Abstracto',
-  'Paisaje',
-  'Retrato',
-  'Técnica Mixta',
-  'Botánico',
+  'Velas aromáticas',
+  'Velas de molde',
+  'Velas corporales',
+  'Velas tipo Ramos',
 ];
 
 export const priceRanges = [
   { label: 'Todos', min: 0, max: Infinity },
-  { label: 'Menos de $3,000', min: 0, max: 3000 },
-  { label: '$3,000 - $5,000', min: 3000, max: 5000 },
-  { label: 'Más de $5,000', min: 5000, max: Infinity },
-];
+  { label: '$0 - $5', min: 0, max: 5, maxInclusive: true },
+  { label: '$5 - $15', min: 5, max: 15, minExclusive: true, maxInclusive: true },
+  { label: 'Más de $15', min: 15, max: Infinity, minExclusive: true },
+] satisfies PriceRange[];

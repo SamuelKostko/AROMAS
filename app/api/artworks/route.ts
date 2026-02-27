@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { generateNextArtworkId, readCatalog, writeCatalog } from '@/lib/catalog-storage';
 import { isAdminSession } from '@/lib/admin-auth';
-import type { Artwork } from '@/lib/art-data';
+import { categories, type Artwork } from '@/lib/art-data';
 
 export async function GET() {
   const artworks = await readCatalog();
@@ -27,25 +27,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'title is required' }, { status: 400 });
   }
 
-  const nowYear = new Date().getFullYear();
   const newArtwork: Artwork = {
     id: generateNextArtworkId(artworks),
     title,
-    artist: String(body.artist ?? '').trim() || 'Artista',
-    year: Number.isFinite(Number(body.year)) ? Number(body.year) : nowYear,
     price: Number.isFinite(Number(body.price)) ? Number(body.price) : 0,
-    currency: String(body.currency ?? 'USD').trim() || 'USD',
-    dimensions: {
-      width: Number.isFinite(Number(body.dimensions?.width)) ? Number(body.dimensions?.width) : 0,
-      height: Number.isFinite(Number(body.dimensions?.height)) ? Number(body.dimensions?.height) : 0,
-      unit: String(body.dimensions?.unit ?? 'cm').trim() || 'cm',
-    },
-    medium: String(body.medium ?? '').trim() || 'Técnica no especificada',
     description: String(body.description ?? '').trim() || 'Sin descripción.',
-    image: String(body.image ?? '').trim() || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
-    category: String(body.category ?? '').trim() || 'Pintura',
-    availability: (body.availability as Artwork['availability']) || 'available',
-    edition: body.edition ? String(body.edition) : undefined,
+    image:
+      String(body.image ?? '').trim() ||
+      'https://images.unsplash.com/photo-1603006918143-0442e0f0fbc3?w=800&q=80',
+    category:
+      String(body.category ?? '').trim() ||
+      (categories.find((category) => category !== 'Todos') ?? 'Velas aromáticas'),
   };
 
   const updated = [newArtwork, ...artworks];

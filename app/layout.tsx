@@ -4,6 +4,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import CartSidebar from '@/components/CartSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
+import { SITE } from '@/lib/site';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -24,9 +25,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'HYOSS_ART - Galería de Arte',
-  description: 'Descubre y adquiere obras únicas de Yosmar Hernández. Catálogo curado de pinturas, abstracciones y arte moderno.',
-  keywords: ['arte', 'galería', 'pintura', 'comprar arte'],
+  title: `${SITE.brandName} - Velas Aromáticas`,
+  description: SITE.description,
+  keywords: SITE.keywords,
 };
 
 export default function RootLayout({

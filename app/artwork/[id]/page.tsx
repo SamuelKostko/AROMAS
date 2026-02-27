@@ -1,11 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowLeft, Heart, Share2, Info, Ruler, Palette } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Info } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import type { Artwork } from '@/lib/art-data';
 import { useCartStore } from '@/lib/cart-store';
+import { SITE } from '@/lib/site';
 
 export default function ArtworkDetail() {
   const params = useParams();
@@ -45,7 +46,7 @@ export default function ArtworkDetail() {
   if (isLoading && !artwork) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="font-sans text-neutral-600">Cargando obra…</p>
+        <p className="font-sans text-neutral-600">Cargando producto…</p>
       </div>
     );
   }
@@ -54,7 +55,7 @@ export default function ArtworkDetail() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="font-display text-3xl text-foreground mb-4">Obra no encontrada</h2>
+          <h2 className="font-display text-3xl text-foreground mb-4">Producto no encontrado</h2>
           <button
             onClick={() => router.push('/')}
             className="font-sans text-neutral-600 hover:text-foreground transition-colors"
@@ -77,7 +78,7 @@ export default function ArtworkDetail() {
 
     const shareData = {
       title: artwork.title,
-      text: `Mira esta obra en HYOSS_ART: ${artwork.title} — ${artwork.artist}`,
+      text: `Mira este producto en ${SITE.brandName}: ${artwork.title}`,
       url,
     };
 
@@ -182,41 +183,12 @@ export default function ArtworkDetail() {
           >
             {/* Header */}
             <div>
-              <span className="inline-block px-3 py-1 bg-accent-cream text-foreground text-sm font-sans tracking-wide rounded mb-4">
-                {artwork.category}
-              </span>
               <h1 className="font-display text-4xl sm:text-5xl text-foreground mb-3">
                 {artwork.title}
               </h1>
-              <p className="font-sans text-xl text-neutral-600 mb-6">{artwork.artist}</p>
               <div className="flex items-baseline space-x-2">
                 <span className="font-display text-4xl text-foreground">
                   ${artwork.price.toLocaleString()}
-                </span>
-                <span className="font-sans text-lg text-neutral-500">
-                  {artwork.currency}
-                </span>
-              </div>
-            </div>
-
-            {/* Availability */}
-            <div className="py-4 border-y border-neutral-200">
-              <div className="flex items-center space-x-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    artwork.availability === 'available'
-                      ? 'bg-green-500'
-                      : artwork.availability === 'reserved'
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
-                  }`}
-                />
-                <span className="font-sans text-sm text-foreground">
-                  {artwork.availability === 'available'
-                    ? 'Disponible'
-                    : artwork.availability === 'reserved'
-                    ? 'Reservado'
-                    : 'Vendido'}
                 </span>
               </div>
             </div>
@@ -232,56 +204,17 @@ export default function ArtworkDetail() {
               </p>
             </div>
 
-            {/* Specifications */}
-            <div className="space-y-4">
-              <h2 className="font-display text-xl text-foreground">Especificaciones</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-start space-x-3 p-4 bg-neutral-50 rounded-sm">
-                  <Ruler className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-sans text-sm text-neutral-600 mb-1">Dimensiones</p>
-                    <p className="font-sans text-base text-foreground font-medium">
-                      {artwork.dimensions.width} × {artwork.dimensions.height}{' '}
-                      {artwork.dimensions.unit}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3 p-4 bg-neutral-50 rounded-sm">
-                  <Palette className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-sans text-sm text-neutral-600 mb-1">Técnica</p>
-                    <p className="font-sans text-base text-foreground font-medium">
-                      {artwork.medium}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3 p-4 bg-neutral-50 rounded-sm">
-                  <Info className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-sans text-sm text-neutral-600 mb-1">Edición</p>
-                    <p className="font-sans text-base text-foreground font-medium">
-                      {artwork.edition || 'Pieza única'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Actions */}
-            {artwork.availability === 'available' && (
-              <div className="space-y-3">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleAddToCart}
-                  className="w-full bg-foreground text-background py-4 rounded-sm font-sans font-semibold tracking-wide hover:bg-neutral-800 transition-colors"
-                >
-                  Añadir al carrito
-                </motion.button>
-              </div>
-            )}
+            <div className="space-y-3">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleAddToCart}
+                className="w-full bg-foreground text-background py-4 rounded-sm font-sans font-semibold tracking-wide hover:bg-neutral-800 transition-colors"
+              >
+                Añadir al carrito
+              </motion.button>
+            </div>
           </motion.div>
         </div>
       </div>

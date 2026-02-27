@@ -1,21 +1,10 @@
 [
   {
     "id": "001",
-    "title": "VIRGEN DEL VALLE",
-    "artist": "Yosmar Hernandez",
-    "year": 2025,
-    "price": 30,
-    "currency": "USD",
-    "dimensions": {
-      "width": 40,
-      "height": 20,
-      "unit": "cm"
-    },
-    "medium": "Técnica no especificada",
-    "description": "Cuadro hecho en madera mostrando la Virgen del Valle",
-    "image": "/uploads/9ac072b98de86a67661e11d58a57233c.jpg",
-    "category": "Pintura",
-    "availability": "available",
-    "edition": ""
+    "title": "MARGARITAS Sin Envoltorio",
+    "price": 16,
+    "image": "/uploads/b8d41f008a146a04b7eedccec704b6e3.jpeg",
+    "description": "Vela aromática artesanal.",
+    "category": "Velas de molde"
   }
 ]

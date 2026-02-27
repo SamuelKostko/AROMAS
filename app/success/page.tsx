@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Home, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { SITE } from '@/lib/site';
 
 export default function Success() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export default function Success() {
             <ul className="font-sans text-sm text-neutral-700 space-y-2">
               <li className="flex items-start">
                 <span className="mr-2">1.</span>
-                <span>Confirmaremos disponibilidad de las obras</span>
+                <span>Confirmaremos disponibilidad de las velas</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">2.</span>
@@ -79,7 +80,7 @@ export default function Success() {
               </li>
               <li className="flex items-start">
                 <span className="mr-2">4.</span>
-                <span>Preparamos tu obra con certificado de autenticidad</span>
+                <span>Preparamos tu pedido y coordinamos la entrega</span>
               </li>
             </ul>
           </div>
@@ -90,10 +91,10 @@ export default function Success() {
             </h3>
             <p className="font-sans text-sm text-neutral-700 mb-3">
               No dudes en escribirnos por WhatsApp si necesitas información adicional
-              sobre las obras o el proceso de compra.
+              sobre aromas, disponibilidad o el proceso de compra.
             </p>
             <a
-              href="https://wa.me/584123580995"
+              href={SITE.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-2 text-green-600 hover:text-green-700 transition-colors font-sans text-sm font-medium"
