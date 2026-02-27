@@ -63,6 +63,11 @@ export default function ArtGallery() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  const canSaveDraft =
+    !isSaving &&
+    !isUploadingImage &&
+    Boolean(String(draft.title ?? '').trim());
+
   const refreshCatalog = async () => {
     setIsLoading(true);
     setLoadError(null);
@@ -339,10 +344,14 @@ export default function ArtGallery() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={saveDraft}
-                      disabled={isSaving || isUploadingImage || !String(draft.title ?? '').trim()}
+                      disabled={!canSaveDraft}
                       className="flex-1 px-4 py-2 rounded-sm bg-foreground text-background font-sans text-sm font-semibold hover:bg-neutral-800 transition-colors disabled:opacity-50"
                     >
-                        {editingId ? 'Guardar cambios' : 'Agregar producto'}
+                        {isSaving
+                          ? 'Guardando…'
+                          : editingId
+                            ? 'Guardar cambios'
+                            : 'Agregar producto'}
                     </button>
                     {editingId && (
                       <button
@@ -354,6 +363,16 @@ export default function ArtGallery() {
                       </button>
                     )}
                   </div>
+                  {!String(draft.title ?? '').trim() && (
+                    <p className="font-sans text-xs text-neutral-600">
+                      Escribe un nombre para habilitar el botón.
+                    </p>
+                  )}
+                  {isUploadingImage && (
+                    <p className="font-sans text-xs text-neutral-600">
+                      Espera a que termine la subida de la imagen.
+                    </p>
+                  )}
                   {saveError && (
                     <p className="font-sans text-xs text-neutral-600">{saveError}</p>
                   )}
