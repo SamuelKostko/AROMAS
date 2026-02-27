@@ -1,9 +1,15 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import type { Artwork } from '@/lib/art-data';
+import { head, put } from '@vercel/blob';
 
 const CATALOG_DIRNAME = 'data';
 const CATALOG_FILENAME = 'catalog.json';
+const CATALOG_BLOB_PATHNAME = `${CATALOG_DIRNAME}/${CATALOG_FILENAME}`;
+
+function hasBlobToken(): boolean {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
 
 function getCatalogPath(): string {
   return path.join(process.cwd(), CATALOG_DIRNAME, CATALOG_FILENAME);
@@ -19,6 +25,20 @@ async function fileExists(filePath: string): Promise<boolean> {
 }
 
 async function ensureCatalogFile(): Promise<void> {
+  if (hasBlobToken()) {
+    try {
+      await head(CATALOG_BLOB_PATHNAME);
+      return;
+    } catch {
+      await put(CATALOG_BLOB_PATHNAME, JSON.stringify([], null, 2), {
+        access: 'public',
+        contentType: 'application/json; charset=utf-8',
+        addRandomSuffix: false,
+      });
+      return;
+    }
+  }
+
   const catalogPath = getCatalogPath();
   const exists = await fileExists(catalogPath);
   if (exists) return;
@@ -28,8 +48,23 @@ async function ensureCatalogFile(): Promise<void> {
 }
 
 export async function readCatalog(): Promise<Artwork[]> {
-  const catalogPath = getCatalogPath();
   await ensureCatalogFile();
+
+  if (hasBlobToken()) {
+    try {
+      const info = await head(CATALOG_BLOB_PATHNAME);
+      const res = await fetch(info.url, { cache: 'no-store' });
+      if (!res.ok) return [];
+      const raw = await res.text();
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed as Artwork[];
+    } catch {
+      return [];
+    }
+  }
+
+  const catalogPath = getCatalogPath();
 
   const raw = await fs.readFile(catalogPath, 'utf8');
   try {
@@ -42,6 +77,15 @@ export async function readCatalog(): Promise<Artwork[]> {
 }
 
 export async function writeCatalog(artworks: Artwork[]): Promise<void> {
+  if (hasBlobToken()) {
+    await put(CATALOG_BLOB_PATHNAME, JSON.stringify(artworks, null, 2), {
+      access: 'public',
+      contentType: 'application/json; charset=utf-8',
+      addRandomSuffix: false,
+    });
+    return;
+  }
+
   const catalogPath = getCatalogPath();
   await fs.mkdir(path.dirname(catalogPath), { recursive: true });
 

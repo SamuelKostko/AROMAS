@@ -19,6 +19,9 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json({ ok: true });
-  setAdminSessionCookie(response);
+  const forwardedProto = request.headers.get('x-forwarded-proto');
+  const protocol = forwardedProto ?? new URL(request.url).protocol.replace(':', '');
+  const secure = protocol === 'https';
+  setAdminSessionCookie(response, { secure });
   return response;
 }

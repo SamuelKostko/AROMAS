@@ -33,6 +33,10 @@ Vercel es la plataforma oficial para Next.js y ofrece el mejor rendimiento y exp
    - En Vercel Dashboard > Settings > Environment Variables
    - Agrega las siguientes si es necesario:
      ```
+  # Requerido para subir imágenes y guardar cambios del catálogo en Vercel
+  # (en Vercel el filesystem es solo lectura)
+  BLOB_READ_WRITE_TOKEN=tu_token_de_vercel_blob
+
      NEXT_PUBLIC_WHATSAPP_NUMBER=tu_numero_aqui
      NEXT_PUBLIC_STRIPE_PUBLIC_KEY=tu_key_aqui (si usas Stripe)
      ```

@@ -22,13 +22,20 @@ export async function isAdminSession(): Promise<boolean> {
   return Boolean(value) && value === getExpectedAdminSessionValue();
 }
 
-export function setAdminSessionCookie(response: NextResponse) {
+export function setAdminSessionCookie(
+  response: NextResponse,
+  options?: {
+    secure?: boolean;
+  }
+) {
   response.cookies.set({
     name: ADMIN_COOKIE_NAME,
     value: getExpectedAdminSessionValue(),
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    // In local production runs (e.g. `next start` on http://localhost) a Secure cookie
+    // will not be stored by the browser. Use the request protocol to decide.
+    secure: options?.secure ?? process.env.NODE_ENV === 'production',
     path: '/',
     maxAge: 60 * 60 * 8, // 8 hours
   });

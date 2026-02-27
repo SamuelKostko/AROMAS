@@ -169,7 +169,21 @@ export default function ArtGallery() {
       });
 
       if (!response.ok) {
-        setUploadError('No se pudo subir la imagen.');
+        let details = '';
+        try {
+          const contentType = response.headers.get('content-type') ?? '';
+          if (contentType.includes('application/json')) {
+            const data = (await response.json()) as { error?: string; code?: string };
+            details = data?.error ? ` ${data.error}` : '';
+          } else {
+            const text = await response.text();
+            details = text ? ` ${text}` : '';
+          }
+        } catch {
+          // ignore
+        }
+
+        setUploadError(`No se pudo subir la imagen (HTTP ${response.status}).${details}`);
         return;
       }
 
@@ -180,7 +194,7 @@ export default function ArtGallery() {
         setUploadError('Respuesta inválida al subir la imagen.');
       }
     } catch {
-      setUploadError('No se pudo subir la imagen.');
+      setUploadError('No se pudo subir la imagen (error de red).');
     } finally {
       setIsUploadingImage(false);
     }
