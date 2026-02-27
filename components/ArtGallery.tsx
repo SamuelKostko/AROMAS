@@ -158,7 +158,14 @@ export default function ArtGallery() {
           const contentType = response.headers.get('content-type') ?? '';
           if (contentType.includes('application/json')) {
             const data = (await response.json()) as { error?: string; details?: string };
-            details = data?.error ?? data?.details ?? '';
+            const serverError = String(data?.error ?? '').trim();
+            const serverDetails = String(data?.details ?? '').trim();
+
+            if (serverDetails && serverError && serverDetails !== serverError) {
+              details = `${serverError}: ${serverDetails}`;
+            } else {
+              details = serverDetails || serverError;
+            }
           } else {
             details = await response.text();
           }
@@ -199,8 +206,18 @@ export default function ArtGallery() {
         try {
           const contentType = response.headers.get('content-type') ?? '';
           if (contentType.includes('application/json')) {
-            const data = (await response.json()) as { error?: string; code?: string };
-            details = data?.error ? ` ${data.error}` : '';
+            const data = (await response.json()) as { error?: string; details?: string; code?: string };
+            const serverError = String(data?.error ?? '').trim();
+            const serverDetails = String(data?.details ?? '').trim();
+            const code = String(data?.code ?? '').trim();
+
+            const message =
+              serverDetails && serverError && serverDetails !== serverError
+                ? `${serverError}: ${serverDetails}`
+                : serverDetails || serverError;
+
+            details = message ? ` ${message}` : '';
+            if (code) details += ` (code: ${code})`;
           } else {
             const text = await response.text();
             details = text ? ` ${text}` : '';
