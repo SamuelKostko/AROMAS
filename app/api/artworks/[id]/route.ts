@@ -15,7 +15,13 @@ function mergeArtwork(existing: Artwork, patch: Partial<Artwork>): Artwork {
 
 export async function GET(_request: Request, { params }: RouteParams) {
   const { id } = await params;
-  const artworks = await readCatalog();
+  let artworks: Artwork[];
+  try {
+    artworks = await readCatalog();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to read catalog', details: message }, { status: 500 });
+  }
   const artwork = artworks.find((a) => a.id === id);
   if (!artwork) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -29,7 +35,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 
   const { id } = await params;
-  const artworks = await readCatalog();
+  let artworks: Artwork[];
+  try {
+    artworks = await readCatalog();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to read catalog', details: message }, { status: 500 });
+  }
   const index = artworks.findIndex((a) => a.id === id);
   if (index === -1) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -46,7 +58,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const updated = [...artworks];
   updated[index] = updatedArtwork;
 
-  await writeCatalog(updated);
+  try {
+    await writeCatalog(updated);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to write catalog', details: message }, { status: 500 });
+  }
   return NextResponse.json(updatedArtwork);
 }
 
@@ -56,12 +73,23 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   }
 
   const { id } = await params;
-  const artworks = await readCatalog();
+  let artworks: Artwork[];
+  try {
+    artworks = await readCatalog();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to read catalog', details: message }, { status: 500 });
+  }
   const updated = artworks.filter((a) => a.id !== id);
   if (updated.length === artworks.length) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  await writeCatalog(updated);
+  try {
+    await writeCatalog(updated);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to write catalog', details: message }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

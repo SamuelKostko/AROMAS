@@ -61,6 +61,7 @@ export default function ArtGallery() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const refreshCatalog = async () => {
     setIsLoading(true);
@@ -134,6 +135,7 @@ export default function ArtGallery() {
     if (!title) return;
 
     setIsSaving(true);
+    setSaveError(null);
     try {
       const isEdit = Boolean(editingId);
       const url = isEdit ? `/api/artworks/${editingId}` : '/api/artworks';
@@ -146,11 +148,30 @@ export default function ArtGallery() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        let details = '';
+        try {
+          const contentType = response.headers.get('content-type') ?? '';
+          if (contentType.includes('application/json')) {
+            const data = (await response.json()) as { error?: string; details?: string };
+            details = data?.error ?? data?.details ?? '';
+          } else {
+            details = await response.text();
+          }
+        } catch {
+          // ignore
+        }
+
+        setSaveError(
+          `No se pudo guardar el producto (HTTP ${response.status}).${details ? ` ${details}` : ''}`
+        );
+        return;
       }
 
       await refreshCatalog();
       resetDraft();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error desconocido';
+      setSaveError(`No se pudo guardar el producto. ${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -333,6 +354,9 @@ export default function ArtGallery() {
                       </button>
                     )}
                   </div>
+                  {saveError && (
+                    <p className="font-sans text-xs text-neutral-600">{saveError}</p>
+                  )}
                 </div>
               </div>
 

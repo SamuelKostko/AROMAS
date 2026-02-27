@@ -4,8 +4,13 @@ import { isAdminSession } from '@/lib/admin-auth';
 import { categories, type Artwork } from '@/lib/art-data';
 
 export async function GET() {
-  const artworks = await readCatalog();
-  return NextResponse.json(artworks);
+  try {
+    const artworks = await readCatalog();
+    return NextResponse.json(artworks);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to read catalog', details: message }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -13,7 +18,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const artworks = await readCatalog();
+  let artworks: Artwork[];
+  try {
+    artworks = await readCatalog();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to read catalog', details: message }, { status: 500 });
+  }
 
   let body: Partial<Artwork>;
   try {
@@ -41,7 +52,12 @@ export async function POST(request: Request) {
   };
 
   const updated = [newArtwork, ...artworks];
-  await writeCatalog(updated);
+  try {
+    await writeCatalog(updated);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to write catalog', details: message }, { status: 500 });
+  }
 
   return NextResponse.json(newArtwork, { status: 201 });
 }
