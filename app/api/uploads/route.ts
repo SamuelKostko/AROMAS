@@ -38,11 +38,6 @@ export async function POST(request: Request) {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
-  const maxBytes = 5 * 1024 * 1024; // 5MB
-  if (buffer.byteLength > maxBytes) {
-    return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 413 });
-  }
-
   const ext = safeExtension(file.name, file.type);
   const name = `${crypto.randomBytes(16).toString('hex')}${ext}`;
 
