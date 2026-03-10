@@ -25,7 +25,7 @@ export const categories = [
 
 export const priceRanges = [
   { label: 'Todos', min: 0, max: Infinity },
-  { label: '$0 - $5', min: 0, max: 5, maxInclusive: true },
-  { label: '$5 - $15', min: 5, max: 15, minExclusive: true, maxInclusive: true },
-  { label: 'Más de $15', min: 15, max: Infinity, minExclusive: true },
+  { label: '0 € - 5 €', min: 0, max: 5, maxInclusive: true },
+  { label: '5 € - 15 €', min: 5, max: 15, minExclusive: true, maxInclusive: true },
+  { label: 'Más de 15 €', min: 15, max: Infinity, minExclusive: true },
 ] satisfies PriceRange[];

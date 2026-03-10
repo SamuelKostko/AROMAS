@@ -5,6 +5,7 @@ import { ShoppingBag, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { Artwork } from '@/lib/art-data';
 import { useCartStore } from '@/lib/cart-store';
+import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
 
 interface ArtCardProps {
@@ -95,7 +96,7 @@ export default function ArtCard({ artwork, index }: ArtCardProps) {
             </div>
             <div className="flex-shrink-0 text-right">
               <p className="font-sans text-base sm:text-lg font-semibold text-foreground">
-                ${artwork.price.toLocaleString()}
+                {formatPrice(artwork.price)}
               </p>
             </div>
           </div>

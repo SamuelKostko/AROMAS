@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import ArtCard from './ArtCard';
 import FilterSidebar from './FilterSidebar';
 import { categories, priceRanges, type Artwork } from '@/lib/art-data';
+import { formatPrice } from '@/lib/utils';
 
 type ArtworkDraft = Partial<Artwork>;
 
@@ -413,7 +414,7 @@ export default function ArtGallery() {
                           {artwork.title}
                         </p>
                         <p className="font-sans text-xs text-neutral-600 truncate">
-                          #{artwork.id} · ${artwork.price.toLocaleString()}
+                          #{artwork.id} · {formatPrice(artwork.price)}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">

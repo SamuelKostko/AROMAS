@@ -1,5 +1,6 @@
 import { CartItem } from './cart-store';
 import { SITE } from './site';
+import { formatPrice } from './utils';
 
 export function generateWhatsAppMessage(items: CartItem[], totalPrice: number): string {
   const businessPhone = SITE.whatsappPhone;
@@ -9,14 +10,14 @@ export function generateWhatsAppMessage(items: CartItem[], totalPrice: number): 
   
   items.forEach((item, index) => {
     message += `${index + 1}. *${item.title}*\n`;
-    message += `   Precio: $${item.price.toLocaleString()}\n`;
+    message += `   Precio: ${formatPrice(item.price)}\n`;
     if (item.quantity > 1) {
       message += `   Cantidad: ${item.quantity}\n`;
     }
     message += '\n';
   });
   
-  message += `*Total: $${totalPrice.toLocaleString()}*\n\n`;
+  message += `*Total: ${formatPrice(totalPrice)}*\n\n`;
   message += '¿Podrían darme más información sobre disponibilidad y envío?';
   
   const encodedMessage = encodeURIComponent(message);
@@ -27,7 +28,7 @@ export function generateStripeCheckout(items: CartItem[]): string {
   // Esta es una URL de ejemplo - en producción se conectaría con Stripe API
   const lineItems = items.map(item => ({
     price_data: {
-      currency: 'usd',
+      currency: 'eur',
       product_data: {
         name: item.title,
         description: item.description,

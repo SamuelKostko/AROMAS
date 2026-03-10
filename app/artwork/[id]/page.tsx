@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import type { Artwork } from '@/lib/art-data';
 import { useCartStore } from '@/lib/cart-store';
 import { SITE } from '@/lib/site';
+import { formatPrice } from '@/lib/utils';
 
 export default function ArtworkDetail() {
   const params = useParams();
@@ -188,7 +189,7 @@ export default function ArtworkDetail() {
               </h1>
               <div className="flex items-baseline space-x-2">
                 <span className="font-display text-4xl text-foreground">
-                  ${artwork.price.toLocaleString()}
+                  {formatPrice(artwork.price)}
                 </span>
               </div>
             </div>

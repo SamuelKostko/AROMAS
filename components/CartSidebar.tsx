@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Trash2, MessageCircle } from 'lucide-react';
 import { useCartStore } from '@/lib/cart-store';
 import { generateWhatsAppMessage } from '@/lib/checkout-utils';
+import { formatPrice } from '@/lib/utils';
 
 export default function CartSidebar() {
   const {
@@ -99,7 +100,7 @@ export default function CartSidebar() {
                             {item.title}
                           </h3>
                           <p className="font-sans text-sm font-semibold text-foreground mt-2">
-                            ${item.price.toLocaleString()}
+                            {formatPrice(item.price)}
                           </p>
                         </div>
                         <button
@@ -150,7 +151,7 @@ export default function CartSidebar() {
                 <div className="flex items-center justify-between">
                   <span className="font-display text-xl text-foreground">Total</span>
                   <span className="font-display text-2xl text-foreground">
-                    ${totalPrice.toLocaleString()}
+                    {formatPrice(totalPrice)}
                   </span>
                 </div>
 
