@@ -1,9 +1,9 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-const euroFormatter = new Intl.NumberFormat('es-ES', {
+const priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'USD',
 });
 
 export function cn(...inputs: ClassValue[]) {
@@ -11,5 +11,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(price: number) {
-  return euroFormatter.format(price);
+  return priceFormatter.format(price);
 }
