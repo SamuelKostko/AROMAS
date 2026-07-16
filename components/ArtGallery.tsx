@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import ArtCard from './ArtCard';
 import FilterSidebar from './FilterSidebar';
+import PopupAd from './PopupAd';
+import CoursesSection from './CoursesSection';
+import AdminPanel from './AdminPanel';
 import { categories, priceRanges, type Artwork } from '@/lib/art-data';
 import { formatPrice } from '@/lib/utils';
 
@@ -260,7 +263,8 @@ export default function ArtGallery() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <PopupAd />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         {adminMode && (
           <div className="mb-8 p-6 bg-neutral-50 border border-neutral-200 rounded-sm">
@@ -438,6 +442,9 @@ export default function ArtGallery() {
                 </div>
               </div>
             </div>
+
+            {/* NEW ADMIN PANEL FOR ADS AND COURSES */}
+            <AdminPanel />
           </div>
         )}
 
@@ -506,6 +513,9 @@ export default function ArtGallery() {
             )}
           </div>
         </div>
+
+        {/* Courses */}
+        <CoursesSection />
       </div>
     </div>
   );
