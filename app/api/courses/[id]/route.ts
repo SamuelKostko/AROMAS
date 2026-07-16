@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import { readCourses, writeCourses, type Course } from '@/lib/courses-storage';
 import { isAdminSession } from '@/lib/admin-auth';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+type RouteParams = { params: Promise<{ id: string }> };
+
+export async function PUT(request: Request, { params }: RouteParams) {
   if (!(await isAdminSession())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   let courses: Course[];
   try {
@@ -55,12 +57,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   return NextResponse.json(updatedCourse);
 }
 
-export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_request: Request, { params }: RouteParams) {
   if (!(await isAdminSession())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   let courses: Course[];
   try {

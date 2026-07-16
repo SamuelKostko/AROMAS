@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import type { AdData } from '@/lib/ad-storage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import Image from 'next/image';
 
 export default function PopupAd() {
   const [ad, setAd] = useState<AdData | null>(null);
