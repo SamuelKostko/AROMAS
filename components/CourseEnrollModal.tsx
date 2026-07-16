@@ -5,6 +5,7 @@ import type { Course } from '@/lib/courses-storage';
 import { formatPrice } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { X, Send } from 'lucide-react';
+import { SITE } from '@/lib/site';
 
 interface Props {
   course: Course;
@@ -19,7 +20,7 @@ export default function CourseEnrollModal({ course, onClose }: Props) {
   const handleEnroll = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const adminPhone = '584120000000'; // Change to actual WhatsApp number
+    const adminPhone = SITE.whatsappPhone;
     const message = `Hola, me gustaría inscribirme en el curso:
 *${course.theme}*
 Fecha: ${course.date}

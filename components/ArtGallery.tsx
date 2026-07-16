@@ -463,6 +463,9 @@ export default function ArtGallery() {
           </p>
         </motion.div>
 
+        {/* Courses prominent section placed BEFORE gallery */}
+        <CoursesSection />
+
         {/* Gallery */}
         <div className="flex flex-col lg:flex-row gap-8">
           <FilterSidebar
@@ -513,9 +516,6 @@ export default function ArtGallery() {
             )}
           </div>
         </div>
-
-        {/* Courses */}
-        <CoursesSection />
       </div>
     </div>
   );
